@@ -1,192 +1,130 @@
 import { Hono } from "hono"
-import db from "../db"
-import { groupsTable } from "../db/schemas/group"
-import { matchesTable } from "../db/schemas/matches"
-import { and, eq } from "drizzle-orm"
 import createRandomMatches from "../lib/sorter"
-import { usersMatches } from "../db/queries/usersMatches"
 import { HTTPException } from "hono/http-exception"
 import { validator } from "hono/validator"
+import {
+	createGroup,
+	existsInGroup,
+	getGroup,
+	getGroupMatches,
+	getGroupUsers,
+	insertMatches,
+	getUser,
+} from "../db/queries"
+import {
+	validateGroup,
+	validateGroupBody,
+	validateGroupDrawed,
+	validateId,
+	validateOwner,
+	validateUser,
+} from "../middleware/validator"
+import { addUserGroup } from "../db/queries/groups/addUserGroup"
 
 const groups = new Hono()
 
-groups.get("/:id", async (c) => {
-	const id = Number(c.req.param("id"))
-	try {
-		const group = await db
-			.select()
-			.from(groupsTable)
-			.where(eq(groupsTable.id, id))
-			.limit(1)
+groups.get("/:id", validateId("id"), validateGroup, async (c) => {
+	const group = c.get("group")
 
-		if (!group.length) {
-			throw new HTTPException(404, {
-				message: "Grupo não encontrado",
-			})
-		}
-
-		return c.json({ group }, 200)
-	} catch (error) {
-		console.error(error)
-		if (error instanceof HTTPException) {
-			return c.json({ error: error.message }, error.status)
-		}
-		return c.json({ error: "Ocorreu um erro inesperado" }, 500)
-	}
+	return c.json({ group }, 200)
 })
 
-groups.post("/", async (c) => {
-	try {
-		const { name, ownerId, eventDate } =
-			await c.req.json<typeof groupsTable.$inferInsert>()
-		if (!name || !ownerId) {
-			throw new HTTPException(400, {
-				message: "Os campos name e ownerId são obrigatórios",
-			})
-		}
-		const group = await db
-			.insert(groupsTable)
-			.values({
-				name,
-				ownerId,
-				status: "waiting",
-				eventDate: eventDate ?? undefined,
-			})
-			.returning({
-				id: groupsTable.id,
-				name: groupsTable.name,
-				ownerId: groupsTable.ownerId,
-				status: groupsTable.status,
-				eventDate: groupsTable.eventDate,
-			})
-		await db
-			.insert(matchesTable)
-			.values([{ groupId: group[0].id, userId: ownerId }])
-		return c.json({ group }, 201)
-	} catch (error) {
-		console.error(error)
-		if (error instanceof HTTPException) {
-			return c.json({ error: error.message }, error.status)
-		}
-		return c.json({ error: "Ocorreu um erro inesperado" }, 500)
-	}
+groups.post("/", validateGroupBody, validateOwner, async (c) => {
+	const data = c.get("groupBody")
+
+	const group = createGroup(data.name, data.ownerId, data.eventDate)
+
+	return c.json({ group }, 201)
 })
 
-groups.post("/:id/add", async (c) => {
-	const id = Number(c.req.param("id"))
-	const { userId } = await c.req.json<typeof matchesTable.$inferInsert>()
-	try {
-		if (!userId) {
+groups.post(
+	"/:groupId/add",
+	validator("param", (param, c) => {
+		const id = Number(param.id)
+		if (Number.isNaN(id)) {
 			throw new HTTPException(400, {
-				message: "O campo userId é obrigatório",
+				message: "ID do grupo inválido",
 			})
 		}
-		const group = await db
-			.select()
-			.from(groupsTable)
-			.where(eq(groupsTable.id, id))
-			.limit(1)
-
-		if (!group.length) {
-			throw new HTTPException(404, {
-				message: "Grupo não encontrado",
-			})
-		}
-		if (group[0].status !== "waiting") {
+		return { id }
+	}),
+	validator("json", (value, c) => {
+		const userId = Number(value.userId)
+		if (!userId || Number.isNaN(userId)) {
 			throw new HTTPException(400, {
-				message:
-					"Não é possível adicionar usuário a grupo que não está esperando",
+				message: "ID do usuário inválido",
 			})
 		}
+		return { userId }
+	}),
+	async (c) => {
+		const { id } = c.req.valid("param")
+		const { userId } = c.req.valid("json")
 
-		const matches = await db
-			.select()
-			.from(matchesTable)
-			.where(and(eq(matchesTable.groupId, id), eq(matchesTable.userId, userId)))
+		try {
+			// Verifica se o usuário existe
+			const [user] = await getUser({ id: userId })
+			if (!user) {
+				throw new HTTPException(404, {
+					message: "Usuário não encontrado",
+				})
+			}
 
-		if (matches.length) {
-			throw new HTTPException(400, {
-				message: "Usuário já está no grupo",
-			})
+			const [group] = await getGroup(id)
+
+			if (!group) {
+				throw new HTTPException(404, {
+					message: "Grupo não encontrado",
+				})
+			}
+
+			if (group.status !== "waiting") {
+				throw new HTTPException(400, {
+					message:
+						"Não é possível adicionar usuário a grupo que não está esperando",
+				})
+			}
+
+			const userExists = await existsInGroup(userId, id)
+
+			if (userExists) {
+				throw new HTTPException(400, {
+					message: "Usuário já está no grupo",
+				})
+			}
+
+			await addUserGroup(userId, id)
+
+			return c.json({ message: "Usuário adicionado com sucesso" }, 201)
+		} catch (error) {
+			console.error(error)
+			if (error instanceof HTTPException) {
+				return c.json({ error: error.message }, error.status)
+			}
+			return c.json({ error: "Ocorreu um erro inesperado" }, 500)
 		}
+	},
+)
 
-		await db.insert(matchesTable).values({
-			groupId: id,
-			userId,
-		})
+groups.post(
+	"/:groupIId/draw",
+	validateId("groupId"),
+	validateGroup,
+	validateGroupDrawed,
+	async (c) => {
+		const id = c.get("groupId")
 
-		return c.json({ message: "Usuário adicionado com sucesso" }, 201)
-	} catch (error) {
-		console.error(error)
-		if (error instanceof HTTPException) {
-			return c.json({ error: error.message }, error.status)
-		}
-		return c.json({ error: "Ocorreu um erro inesperado" }, 500)
-	}
-})
+		const currentUsers = await getGroupUsers(id)
 
-// groups.post("/:id/remove", async (c) => {
-// 	const id = Number(c.req.param("id"))
-// 	const { userId } = await c.req.json<typeof matchesTable.$inferInsert>()
-// 	const group = await db
-// 		.delete(matchesTable)
-// 		.where(and(eq(matchesTable.userId, userId), eq(matchesTable.groupId, id)))
-// 	return c.json({ group })
-// })
-
-groups.post("/:id/draw", async (c) => {
-	const id = Number(c.req.param("id"))
-	try {
-		const currentGroup = await db
-			.select()
-			.from(groupsTable)
-			.where(eq(groupsTable.id, id))
-			.limit(1)
-		if (!currentGroup.length) {
-			throw new HTTPException(404, {
-				message: "Grupo não encontrado",
-			})
-		}
-		if (currentGroup[0].status !== "waiting") {
-			throw new HTTPException(400, {
-				message: "Não é possível fazer draw de grupo que não está esperando",
-			})
-		}
-
-		const currentUsers = await db
-			.select({
-				userId: matchesTable.userId,
-			})
-			.from(matchesTable)
-			.where(eq(matchesTable.groupId, id))
-
-		const usersIds = currentUsers.map((r) => r.userId)
+		const usersIds = currentUsers.map((r) => r.id)
 		const matches = createRandomMatches(usersIds)
 
-		for (const [userId, friendId] of matches) {
-			await db
-				.update(matchesTable)
-				.set({ friendId })
-				.where(
-					and(eq(matchesTable.userId, userId), eq(matchesTable.groupId, id)),
-				)
-		}
+		insertMatches(new Map(matches), id)
 
-		await db
-			.update(groupsTable)
-			.set({ status: "drawed" })
-			.where(eq(groupsTable.id, id))
-
-		const users = await usersMatches(id)
+		const users = await getGroupMatches(id)
 
 		return c.json({ users })
-	} catch (error) {
-		console.error(error)
-		if (error instanceof HTTPException) {
-			return c.json({ error: error.message }, error.status)
-		}
-		return c.json({ error: "Ocorreu um erro inesperado" }, 500)
-	}
-})
+	},
+)
 
 export default groups

@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm"
 import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 import { usersTable } from "./user"
 import { createInsertSchema } from "drizzle-zod"
+import { z } from "zod"
 
 export const groupsTable = sqliteTable("groups", {
 	id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
@@ -17,4 +18,8 @@ export const groupsTable = sqliteTable("groups", {
 	eventDate: text("event_date"),
 })
 
-export const insertGroupValidator = createInsertSchema(groupsTable)
+export const insertGroupSchema = z.object({
+	name: z.string().min(1, "Nome é obrigatório"),
+	ownerId: z.number().positive("ID do dono é obrigatório"),
+	eventDate: z.string().datetime().optional(),
+})
