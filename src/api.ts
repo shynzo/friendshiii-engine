@@ -2,8 +2,11 @@ import { Hono } from "hono"
 import groups from "./routes/groups"
 import users from "./routes/user"
 import { errorHandler } from "./middleware/errorHandler"
+import { logger } from "hono/logger"
 
 const api = new Hono()
+
+api.use(logger())
 
 api.options("/ping", (c) => {
 	const res = {
