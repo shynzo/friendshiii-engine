@@ -1,4 +1,4 @@
-# Secret Santa API 🎁
+# Friendshii 🤫🤫🎁
 
 Uma API simples e eficiente para gerenciar sorteios de amigo secreto digitalmente. Desenvolvida como solução para um desafio de backend iniciante, esta API oferece uma maneira prática de organizar grupos e realizar sorteios.
 
