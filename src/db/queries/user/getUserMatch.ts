@@ -8,7 +8,7 @@ export const getUserMatch = async (userId: number, groupId: number) => {
 		.select({
 			// Dados do match
 			id: matchesTable.id,
-			createdAt: matchesTable.createdAt,
+			matchedAt: matchesTable.matchedAt,
 			// Dados do amigo secreto
 			friend: {
 				id: usersTable.id,

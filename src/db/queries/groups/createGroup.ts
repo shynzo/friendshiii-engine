@@ -5,7 +5,7 @@ import { matchesTable } from "../../schemas/matches"
 export const createGroup = async (
 	name: string,
 	ownerId: number,
-	eventDate?: string,
+	eventDate: string,
 ) => {
 	const [group] = await db
 		.insert(groupsTable)
@@ -13,7 +13,7 @@ export const createGroup = async (
 			name,
 			ownerId,
 			status: "waiting",
-			eventDate: eventDate ?? undefined,
+			eventDate: eventDate,
 		})
 		.returning({
 			id: groupsTable.id,
@@ -23,7 +23,11 @@ export const createGroup = async (
 			eventDate: groupsTable.eventDate,
 		})
 
-	await db.insert(matchesTable).values([{ groupId: group.id, userId: ownerId }])
+	await db.insert(matchesTable).values({
+		groupId: group.id,
+		userId: ownerId,
+		joinedAt: new Date().toISOString(),
+	})
 
 	return group
 }

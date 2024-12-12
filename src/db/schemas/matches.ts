@@ -12,5 +12,6 @@ export const matchesTable = sqliteTable("matches", {
 		.notNull()
 		.references(() => usersTable.id),
 	friendId: integer("friend_id").references(() => usersTable.id),
-	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
+	joinedAt: text("joined_at"),
+	matchedAt: text("matched_at"),
 })

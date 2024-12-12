@@ -41,7 +41,6 @@ users.get(
 	validateUser,
 	validateId("groupId"),
 	validateGroup,
-	validateGroupDrawed,
 	async (c) => {
 		const id = c.get("id")
 		const groupId = c.get("groupId")

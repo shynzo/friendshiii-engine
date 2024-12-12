@@ -12,6 +12,7 @@ export const createUser = async (
 			name,
 			email,
 			phone,
+			updateAt: new Date().toISOString(),
 		})
 		.returning({
 			id: usersTable.id,

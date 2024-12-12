@@ -17,22 +17,21 @@ import {
 	validateGroupDrawed,
 	validateId,
 	validateOwner,
-	validateUser,
 } from "../middleware/validator"
 import { addUserGroup } from "../db/queries/groups/addUserGroup"
 
 const groups = new Hono()
 
-groups.get("/:id", validateId("id"), validateGroup, async (c) => {
+groups.get("/:groupId", validateId("groupId"), validateGroup, async (c) => {
 	const group = c.get("group")
-
-	return c.json({ group }, 200)
+	const users = await getGroupUsers(group.id)
+	return c.json({ group, users }, 200)
 })
 
 groups.post("/", validateGroupBody, validateOwner, async (c) => {
 	const data = c.get("groupBody")
 
-	const group = createGroup(data.name, data.ownerId, data.eventDate)
+	const group = await createGroup(data.name, data.ownerId, data.eventDate)
 
 	return c.json({ group }, 201)
 })
@@ -40,7 +39,7 @@ groups.post("/", validateGroupBody, validateOwner, async (c) => {
 groups.post(
 	"/:groupId/add",
 	validator("param", (param, c) => {
-		const id = Number(param.id)
+		const id = Number(param.groupId)
 		if (Number.isNaN(id)) {
 			throw new HTTPException(400, {
 				message: "ID do grupo inválido",
@@ -93,9 +92,9 @@ groups.post(
 				})
 			}
 
-			await addUserGroup(userId, id)
+			const users = await addUserGroup(userId, id)
 
-			return c.json({ message: "Usuário adicionado com sucesso" }, 201)
+			return c.json({ message: "Usuário adicionado com sucesso", users }, 201)
 		} catch (error) {
 			console.error(error)
 			if (error instanceof HTTPException) {
@@ -107,7 +106,7 @@ groups.post(
 )
 
 groups.post(
-	"/:groupIId/draw",
+	"/:groupId/draw",
 	validateId("groupId"),
 	validateGroup,
 	validateGroupDrawed,
@@ -116,10 +115,16 @@ groups.post(
 
 		const currentUsers = await getGroupUsers(id)
 
+		if (currentUsers.length < 2) {
+			throw new HTTPException(400, {
+				message: "Não é possível sortear grupo com menos de 2 usuários",
+			})
+		}
+
 		const usersIds = currentUsers.map((r) => r.id)
 		const matches = createRandomMatches(usersIds)
 
-		insertMatches(new Map(matches), id)
+		await insertMatches(new Map(matches), id)
 
 		const users = await getGroupMatches(id)
 

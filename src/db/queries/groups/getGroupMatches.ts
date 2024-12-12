@@ -10,7 +10,7 @@ export const getGroupMatches = async (groupId: number) => {
 	return await db
 		.select({
 			id: matchesTable.id,
-			createdAt: matchesTable.createdAt,
+			matchedAt: matchesTable.matchedAt,
 			// Dados do participante
 			participant: {
 				id: usersTable.id,
@@ -27,7 +27,7 @@ export const getGroupMatches = async (groupId: number) => {
 			},
 		})
 		.from(matchesTable)
-		.leftJoin(usersTable, eq(usersTable.id, matchesTable.userId))
-		.leftJoin(usersTable, eq(friendTable.id, matchesTable.friendId))
+		.innerJoin(usersTable, eq(usersTable.id, matchesTable.userId))
+		.leftJoin(friendTable, eq(friendTable.id, matchesTable.friendId))
 		.where(eq(matchesTable.groupId, groupId))
 }

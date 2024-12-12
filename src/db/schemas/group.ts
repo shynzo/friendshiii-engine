@@ -14,12 +14,12 @@ export const groupsTable = sqliteTable("groups", {
 		.notNull()
 		.references(() => usersTable.id),
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-	drawAt: text("draw_count"),
+	drewAt: text("drew_at"),
 	eventDate: text("event_date"),
 })
 
 export const insertGroupSchema = z.object({
 	name: z.string().min(1, "Nome é obrigatório"),
 	ownerId: z.number().positive("ID do dono é obrigatório"),
-	eventDate: z.string().datetime().optional(),
+	eventDate: z.string().datetime("A data do evento é obrigatória"),
 })

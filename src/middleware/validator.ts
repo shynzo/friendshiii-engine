@@ -55,7 +55,7 @@ export const validateUserBody = async (
 ) => {
 	const body = await c.req.json()
 	const parse = insertUserSchema.safeParse(body)
-
+	console.log(parse)
 	if (!parse.success) {
 		throw new HTTPException(400, {
 			message: "Dados inválidos",
@@ -140,9 +140,9 @@ export const validateGroupDrawed = async (
 ) => {
 	const group = c.get("group")
 
-	if (group.status !== "drawed") {
+	if (group.status === "drawed") {
 		throw new HTTPException(400, {
-			message: "O grupo ainda não foi sorteado.",
+			message: "O grupo já foi sorteado.",
 		})
 	}
 

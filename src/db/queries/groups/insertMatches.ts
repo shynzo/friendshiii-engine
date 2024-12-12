@@ -1,4 +1,4 @@
-import { eq, sql } from "drizzle-orm"
+import { and, eq, sql } from "drizzle-orm"
 import db from "../.."
 import { matchesTable } from "../../schemas/matches"
 import { groupsTable } from "../../schemas/group"
@@ -8,21 +8,29 @@ export const insertMatches = async (
 	groupId: number,
 ) => {
 	await db.transaction(async (tx) => {
-		const cases = Array.from(matches.entries()).map(
-			([userId, friendId]) =>
-				sql`WHEN (userId = ${userId} AND groupId = ${groupId}) THEN ${friendId}`,
-		)
+		// Atualiza cada match individualmente ao invés de usar CASE
+		for (const [userId, friendId] of matches.entries()) {
+			await tx
+				.update(matchesTable)
+				.set({
+					friendId,
+					matchedAt: new Date().toISOString(),
+				})
+				.where(
+					and(
+						eq(matchesTable.groupId, groupId),
+						eq(matchesTable.userId, userId),
+					),
+				)
+		}
 
-		await tx
-			.update(matchesTable)
-			.set({
-				friendId: sql`CASE ${sql.join(cases, " ")} ELSE friendId END`,
-			})
-			.where(eq(matchesTable.groupId, groupId))
-
+		// Atualiza o status do grupo
 		await tx
 			.update(groupsTable)
-			.set({ status: "drawed", drawAt: new Date().toISOString() })
+			.set({
+				status: "drawed",
+				drewAt: new Date().toISOString(),
+			})
 			.where(eq(groupsTable.id, groupId))
 	})
 }
