@@ -1,6 +1,6 @@
 import { Hono } from "hono"
 import groups from "./routes/groups"
-import users from "./routes/user"
+import users from "./routes/users"
 import { errorHandler } from "./middleware/errorHandler"
 import { logger } from "hono/logger"
 
