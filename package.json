@@ -1,13 +1,14 @@
 {
   "name": "friendshiii-engine",
-  "module": "index.ts",
+  "module": "api.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run src/api.ts --watch",
+    "dev": "bun run --watch src/api.ts",
     "db:generate": "bun x drizzle-kit generate",
     "db:migrate": "bun x drizzle-kit migrate",
-    "db:seed": "bun run src/db/seed.ts",
-    "db:push": "bun x drizzle-kit push"
+    "db:seed": "bun run src/lib/seed.ts",
+    "db:push": "bun x drizzle-kit push",
+    "start": "bun run src/api.ts"
   },
   "dependencies": {
     "drizzle-orm": "^0.37.0",
