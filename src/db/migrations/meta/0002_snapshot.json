@@ -1,8 +1,8 @@
 {
   "version": "6",
   "dialect": "sqlite",
-  "id": "ed0b4032-daeb-4015-abb9-fa31a1b6fa2b",
-  "prevId": "b2518853-1a8d-4c5f-9e67-2654c9aab258",
+  "id": "a121584b-d954-4d3b-ae7c-e5720c062f89",
+  "prevId": "ed0b4032-daeb-4015-abb9-fa31a1b6fa2b",
   "tables": {
     "groups": {
       "name": "groups",
@@ -52,7 +52,7 @@
         },
         "budget": {
           "name": "budget",
-          "type": "text",
+          "type": "real",
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
@@ -71,6 +71,21 @@
           "notNull": false,
           "autoincrement": false,
           "default": "CURRENT_TIMESTAMP"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false,
+          "default": "CURRENT_TIMESTAMP"
+        },
+        "deleted_at": {
+          "name": "deleted_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
         },
         "drawn_at": {
           "name": "drawn_at",
@@ -230,8 +245,15 @@
           "notNull": false,
           "autoincrement": false
         },
-        "update_at": {
-          "name": "update_at",
+        "updated_at": {
+          "name": "updated_at",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false,
+          "autoincrement": false
+        },
+        "deleted_at": {
+          "name": "deleted_at",
           "type": "text",
           "primaryKey": false,
           "notNull": false,
@@ -259,7 +281,7 @@
     "schemas": {},
     "tables": {},
     "columns": {
-      "\"groups\".\"drew_at\"": "\"groups\".\"drawn_at\""
+      "\"users\".\"update_at\"": "\"users\".\"updated_at\""
     }
   },
   "internal": {

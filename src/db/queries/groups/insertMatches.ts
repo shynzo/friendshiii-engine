@@ -4,8 +4,8 @@ import { matchesTable } from "../../schemas/matches"
 import { groupsTable } from "../../schemas/group"
 
 export const insertMatches = async (
-	matches: Map<number, number>,
-	groupId: number,
+	matches: Map<string, string>,
+	groupId: string,
 ) => {
 	await db.transaction(async (tx) => {
 		// Atualiza cada match individualmente ao invés de usar CASE
@@ -28,8 +28,9 @@ export const insertMatches = async (
 		await tx
 			.update(groupsTable)
 			.set({
-				status: "drawed",
-				drewAt: new Date().toISOString(),
+				status: "drawn",
+				drawnAt: new Date().toISOString(),
+				updatedAt: new Date().toISOString(),
 			})
 			.where(eq(groupsTable.id, groupId))
 	})

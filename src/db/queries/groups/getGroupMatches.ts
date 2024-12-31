@@ -4,7 +4,7 @@ import { matchesTable } from "../../schemas/matches"
 import { usersTable } from "../../schemas/user"
 import { alias } from "drizzle-orm/sqlite-core"
 
-export const getGroupMatches = async (groupId: number) => {
+export const getGroupMatches = async (groupId: string) => {
 	const friendTable = alias(usersTable, "friend")
 
 	return await db

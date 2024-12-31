@@ -1,11 +1,11 @@
 import db from "../.."
 import { usersTable } from "../../schemas/user"
 
-export const createUser = async (
-	name: string,
-	email: string,
-	phone: string,
-) => {
+export const createUser = async ({
+	name,
+	email,
+	phone,
+}: { name: string; email: string; phone: string }) => {
 	const [user] = await db
 		.insert(usersTable)
 		.values({

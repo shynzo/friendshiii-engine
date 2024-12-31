@@ -6,8 +6,8 @@ export const getUser = async ({
 	id,
 	email,
 	phone,
-}: { id?: number; email?: string; phone?: string }) => {
-	return await db
+}: { id?: string; email?: string; phone?: string }) => {
+	const [user] = await db
 		.select()
 		.from(usersTable)
 		.where(
@@ -18,4 +18,6 @@ export const getUser = async ({
 			),
 		)
 		.limit(1)
+
+	return user
 }

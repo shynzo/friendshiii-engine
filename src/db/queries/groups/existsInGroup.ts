@@ -2,7 +2,7 @@ import { and, eq } from "drizzle-orm"
 import db from "../.."
 import { matchesTable } from "../../schemas/matches"
 
-export const existsInGroup = async (userId: number, groupId: number) => {
+export const existsInGroup = async (userId: string, groupId: string) => {
 	const [match] = await db
 		.select()
 		.from(matchesTable)

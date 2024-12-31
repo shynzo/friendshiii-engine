@@ -1,21 +1,26 @@
 import { sql } from "drizzle-orm"
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
+import { sqliteTable, text, integer, real } from "drizzle-orm/sqlite-core"
 import { usersTable } from "./user"
-import { createInsertSchema } from "drizzle-zod"
 import { z } from "zod"
+import { generateId } from "../../lib/helpers"
 
 export const groupsTable = sqliteTable("groups", {
-	id: integer("id").primaryKey({ autoIncrement: true }).notNull(),
+	id: text("id").primaryKey().notNull().$defaultFn(generateId),
 	name: text("name").notNull(),
-	status: text("status", { enum: ["waiting", "drawed", "finished"] })
+	description: text("description"),
+	status: text("status", { enum: ["waiting", "drawn", "finished", "deleted"] })
 		.default("waiting")
 		.notNull(),
-	ownerId: integer("owner_id")
+	ownerId: text("owner_id")
 		.notNull()
 		.references(() => usersTable.id),
+	eventDate: text("event_date").notNull(),
+	budget: real("budget"),
+	maximumParticipants: integer("maximum_participants"),
 	createdAt: text("created_at").default(sql`CURRENT_TIMESTAMP`),
-	drewAt: text("drew_at"),
-	eventDate: text("event_date"),
+	updatedAt: text("updated_at").default(sql`CURRENT_TIMESTAMP`),
+	deletedAt: text("deleted_at"),
+	drawnAt: text("drawn_at"),
 })
 
 export const insertGroupSchema = z.object({

@@ -1,19 +1,23 @@
 {
   "name": "friendshiii-engine",
-  "module": "api.ts",
+  "module": "app.ts",
   "type": "module",
   "scripts": {
-    "dev": "bun run --watch src/api.ts",
+    "build": "bun build src/app.ts --target bun --outdir ./dist",
+    "dev": "bun run --watch src/app.ts",
     "db:generate": "bun x drizzle-kit generate",
     "db:migrate": "bun x drizzle-kit migrate",
     "db:seed": "bun run src/lib/seed.ts",
     "db:push": "bun x drizzle-kit push",
-    "start": "bun run src/api.ts"
+    "start": "NODE_ENV=production bun dist/app.js"
   },
   "dependencies": {
+    "@elysiajs/swagger": "^1.2.0",
     "drizzle-orm": "^0.37.0",
+    "drizzle-typebox": "^0.2.1",
     "drizzle-zod": "^0.5.1",
-    "hono": "^4.6.12",
+    "elysia": "^1.2.6",
+    "nanoid": "^5.0.9",
     "zod": "^3.23.8"
   },
   "devDependencies": {
@@ -24,5 +28,8 @@
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
+  },
+  "override": {
+  	"@sinclair/typebox": "0.34.13"
   }
 }

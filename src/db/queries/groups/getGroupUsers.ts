@@ -4,8 +4,8 @@ import { groupsTable } from "../../schemas/group"
 import { matchesTable } from "../../schemas/matches"
 import db from "../.."
 
-export const getGroupUsers = async (groupId: number) => {
-	const participantsQuery = db
+export const getGroupUsers = async (groupId: string) => {
+	const participants = db
 		.select({
 			id: usersTable.id,
 			name: usersTable.name,
@@ -20,5 +20,5 @@ export const getGroupUsers = async (groupId: number) => {
 		.innerJoin(usersTable, eq(usersTable.id, matchesTable.userId))
 		.innerJoin(groupsTable, eq(groupsTable.id, matchesTable.groupId))
 		.where(eq(matchesTable.groupId, groupId))
-	return await participantsQuery
+	return await participants
 }

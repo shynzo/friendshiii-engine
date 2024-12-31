@@ -1,8 +1,4 @@
-function createRandomMatches(userIds: number[]): Map<number, number> {
-	if (userIds.length < 2) {
-		throw new Error("Precisa de pelo menos 2 usuários para fazer matches")
-	}
-
+function createRandomMatches(userIds: string[]): Map<string, string> {
 	const shuffled = Array.from(userIds)
 
 	for (let i = userIds.length - 1; i > 0; i--) {
@@ -13,7 +9,7 @@ function createRandomMatches(userIds: number[]): Map<number, number> {
 		;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
 	}
 
-	const matches = new Map<number, number>()
+	const matches = new Map<string, string>()
 
 	for (let i = 0; i < userIds.length; i++) {
 		matches.set(userIds[i], shuffled[i])

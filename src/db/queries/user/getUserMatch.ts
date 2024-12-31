@@ -3,7 +3,7 @@ import db from "../.."
 import { matchesTable } from "../../schemas/matches"
 import { usersTable } from "../../schemas/user"
 
-export const getUserMatch = async (userId: number, groupId: number) => {
+export const getUserMatch = async (userId: string, groupId: string) => {
 	return await db
 		.select({
 			// Dados do match
