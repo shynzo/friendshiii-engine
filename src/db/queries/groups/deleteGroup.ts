@@ -1,15 +1,8 @@
 import { eq } from "drizzle-orm"
-import db from "../.."
-import { groupsTable } from "../../schemas/group"
-import { getGroup } from "./getGroup"
+import db from "../../../data/db"
+import { groupsTable } from "../../../data/schemas/group"
 
 export const deleteGroup = async (id: string) => {
-	const group = await getGroup(id)
-
-	if (!group) {
-		return null
-	}
-
 	const deletedGroup = await db
 		.update(groupsTable)
 		.set({
@@ -18,6 +11,7 @@ export const deleteGroup = async (id: string) => {
 			updatedAt: new Date().toISOString(),
 		})
 		.where(eq(groupsTable.id, id))
+		.returning()
 
 	return deletedGroup
 }

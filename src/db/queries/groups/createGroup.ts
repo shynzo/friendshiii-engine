@@ -1,6 +1,6 @@
-import db from "../.."
-import { groupsTable } from "../../schemas/group"
-import { matchesTable } from "../../schemas/matches"
+import db from "../../../data/db"
+import { groupsTable } from "../../../data/schemas/group"
+import { matchesTable } from "../../../data/schemas/matches"
 
 export const createGroup = async ({
 	name,

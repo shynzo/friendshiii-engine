@@ -1,7 +1,7 @@
-import db from "../db"
-import { groupsTable } from "../db/schemas/group"
-import { matchesTable } from "../db/schemas/matches"
-import { usersTable } from "../db/schemas/user"
+import db from "../data/db"
+import { groupsTable } from "../data/schemas/group"
+import { matchesTable } from "../data/schemas/matches"
+import { usersTable } from "../data/schemas/user"
 
 const main = async () => {
 	console.log("Seeding...")

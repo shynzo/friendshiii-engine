@@ -1,7 +1,7 @@
 import { and, eq, sql } from "drizzle-orm"
-import db from "../.."
-import { matchesTable } from "../../schemas/matches"
-import { groupsTable } from "../../schemas/group"
+import db from "../../../data/db"
+import { matchesTable } from "../../../data/schemas/matches"
+import { groupsTable } from "../../../data/schemas/group"
 
 export const insertMatches = async (
 	matches: Map<string, string>,

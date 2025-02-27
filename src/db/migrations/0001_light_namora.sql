@@ -1,1 +1,0 @@
-ALTER TABLE `groups` RENAME COLUMN "drew_at" TO "drawn_at";

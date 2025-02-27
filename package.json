@@ -12,13 +12,12 @@
     "start": "NODE_ENV=production bun dist/app.js"
   },
   "dependencies": {
+    "@elysiajs/jwt": "^1.2.0",
     "@elysiajs/swagger": "^1.2.0",
     "drizzle-orm": "^0.37.0",
     "drizzle-typebox": "^0.2.1",
-    "drizzle-zod": "^0.5.1",
     "elysia": "^1.2.6",
-    "nanoid": "^5.0.9",
-    "zod": "^3.23.8"
+    "nanoid": "^5.0.9"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
@@ -30,6 +29,9 @@
     "typescript": "^5.0.0"
   },
   "override": {
-  	"@sinclair/typebox": "0.34.13"
-  }
+    "@sinclair/typebox": "0.34.13"
+  },
+  "trustedDependencies": [
+    "@biomejs/biome"
+  ]
 }

@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
-import db from "../.."
-import { groupsTable } from "../../schemas/group"
+import db from "../../../data/db"
+import { groupsTable } from "../../../data/schemas/group"
 import { getGroupUsers } from "./getGroupUsers"
 
 export const getGroup = async (id: string) => {

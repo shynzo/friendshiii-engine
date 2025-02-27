@@ -1,8 +1,8 @@
 import { eq, sql } from "drizzle-orm"
-import { usersTable } from "../../schemas/user"
-import { groupsTable } from "../../schemas/group"
-import { matchesTable } from "../../schemas/matches"
-import db from "../.."
+import { usersTable } from "../../../data/schemas/user"
+import { groupsTable } from "../../../data/schemas/group"
+import { matchesTable } from "../../../data/schemas/matches"
+import db from "../../../data/db"
 
 export const getGroupUsers = async (groupId: string) => {
 	const participants = db

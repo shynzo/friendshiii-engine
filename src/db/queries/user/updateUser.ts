@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm"
-import { usersTable } from "../../schemas/user"
-import db from "../.."
+import { usersTable } from "../../../data/schemas/user"
+import db from "../../../data/db"
 
 export const updateUser = async ({
 	id,

@@ -1,5 +1,5 @@
-import db from "../.."
-import { usersTable } from "../../schemas/user"
+import db from "../../../data/db"
+import { usersTable } from "../../../data/schemas/user"
 
 export const createUser = async ({
 	name,

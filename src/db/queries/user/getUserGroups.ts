@@ -1,9 +1,9 @@
 import { and, desc, eq, or, sql } from "drizzle-orm"
-import db from "../.."
-import { groupsTable } from "../../schemas/group"
-import { matchesTable } from "../../schemas/matches"
+import db from "../../../data/db"
+import { groupsTable } from "../../../data/schemas/group"
+import { matchesTable } from "../../../data/schemas/matches"
 import { alias } from "drizzle-orm/sqlite-core"
-import { usersTable } from "../../schemas/user"
+import { usersTable } from "../../../data/schemas/user"
 import { getGroupUsers } from "../groups/getGroupUsers"
 
 export const getUserGroups = async (userId: string) => {

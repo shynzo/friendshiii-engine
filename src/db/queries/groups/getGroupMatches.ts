@@ -1,7 +1,7 @@
 import { eq } from "drizzle-orm"
-import db from "../.."
-import { matchesTable } from "../../schemas/matches"
-import { usersTable } from "../../schemas/user"
+import db from "../../../data/db"
+import { matchesTable } from "../../../data/schemas/matches"
+import { usersTable } from "../../../data/schemas/user"
 import { alias } from "drizzle-orm/sqlite-core"
 
 export const getGroupMatches = async (groupId: string) => {

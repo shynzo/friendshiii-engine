@@ -1,7 +1,7 @@
 import { and, eq } from "drizzle-orm"
-import db from "../.."
-import { matchesTable } from "../../schemas/matches"
-import { usersTable } from "../../schemas/user"
+import db from "../../../data/db"
+import { matchesTable } from "../../../data/schemas/matches"
+import { usersTable } from "../../../data/schemas/user"
 
 export const getUserMatch = async (userId: string, groupId: string) => {
 	return await db
